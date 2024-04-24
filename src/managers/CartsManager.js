@@ -3,13 +3,12 @@ import path from 'path';
 import config from '../config/config.js';
 import { ProductManager } from './ProductManager.js';
 
-const cartsFilePath = path.join(config.DIRNAME, '../data/carts.json');
-
 export class CartsManager {
     static #instance;
 
     constructor() {
         this.carts = [];
+        this.path = `${config.DIRNAME}/data/carts.json`;
     }
 
     static getInstance(){
@@ -21,14 +20,14 @@ export class CartsManager {
 
     async createCart(){
         try {
-            const response = await fs.promises.readFile(cartsFilePath, 'utf-8');
+            const response = await fs.promises.readFile(this.path, 'utf-8');
             this.carts = JSON.parse(response);
             const cart = {
                 id: this.carts.length !== 0 ? this.carts[this.carts.length - 1].id + 1 : 1,
                 products: []
             }
 
-            await fs.promises.writeFile(cartsFilePath, JSON.stringify(this.carts, null, '\t'));
+            await fs.promises.writeFile(this.path, JSON.stringify(this.carts, null, '\t'));
             return cart;
         } catch (error) {
             throw error;
@@ -37,7 +36,7 @@ export class CartsManager {
 
     async getCartById(id){
         try {
-            const response = await fs.promises.readFile(cartsFilePath, 'utf-8');
+            const response = await fs.promises.readFile(this.path, 'utf-8');
             this.carts = JSON.parse(response);
             const cart = this.carts.find(cart => cart.id === id);
 
@@ -53,7 +52,7 @@ export class CartsManager {
 
     async addProdToCart(cid, pid){
         try {
-            const response = await fs.promises.readFile(cartsFilePath, 'utf-8');
+            const response = await fs.promises.readFile(this.path, 'utf-8');
             this.carts = JSON.parse(response);
             const cart = this.carts.find(cart => cart.id === cid);
 
@@ -72,7 +71,7 @@ export class CartsManager {
             } else {
                 product.quantity++;
             }
-            await fs.promises.writeFile(cartsFilePath, JSON.stringify(this.carts, null, '\t'));
+            await fs.promises.writeFile(this.path, JSON.stringify(this.carts, null, '\t'));
             
             return cart;
         } catch (error) {
@@ -82,7 +81,7 @@ export class CartsManager {
 
     async deleteProdFromCart(cid, pid){
         try {
-            const response = await fs.promises.readFile(cartsFilePath, 'utf-8');
+            const response = await fs.promises.readFile(this.path, 'utf-8');
             this.carts = JSON.parse(response);
 
             const cart = this.carts.find(cart => cart.id === cid);
@@ -102,7 +101,7 @@ export class CartsManager {
                 cart.products.splice(index, 1);
             }
 
-            await fs.promises.writeFile(cartsFilePath, JSON.stringify(this.carts, null, '\t'));
+            await fs.promises.writeFile(this.path, JSON.stringify(this.carts, null, '\t'));
             return cart;
         } catch (error) {
             throw error;
