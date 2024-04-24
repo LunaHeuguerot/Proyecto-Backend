@@ -1,4 +1,4 @@
-import fs from 'fs/promises';
+import fs from 'fs';
 import config from '../config/config.js';
 
 export class ProductManager {
@@ -64,7 +64,7 @@ export class ProductManager {
 
     async getProducts(){
         try {
-            const data = await fs.readFile(this.path, 'utf-8');
+            const data = await fs.promises.readFile(this.path, 'utf-8');
             this.products = JSON.parse(data);
             console.log('Archivo leído exitosamente');
             return this.products
