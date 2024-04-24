@@ -39,13 +39,15 @@ export class CartsManager {
         try {
             const response = await fs.promises.readFile(this.path, 'utf-8');
             this.carts = JSON.parse(response);
-            const cart = this.carts.find(cart => cart.id === id);
+            const cart = this.carts.find(cart => parseInt(cart.id) === parseInt(id));
 
             if(!cart){
                 throw new Error(`No se encontró el carrito con id ${id}`);
             }
 
-            return cart;
+            console.log('Contenido del carrito:');
+            console.log(cart.products)
+            return cart.products;
         } catch (error) {
             throw error;
         }
@@ -55,17 +57,19 @@ export class CartsManager {
         try {
             const response = await fs.promises.readFile(this.path, 'utf-8');
             this.carts = JSON.parse(response);
-            const cart = this.carts.find(cart => cart.id === cid);
+            const cartIndex = this.carts.findIndex(cart => parseInt(cart.id) === parseInt(cid));
             console.log(response);
-            console.log(cart);
-
-            if(!cart){
+            console.log(cartIndex);
+    
+            if(cartIndex === -1){
                 throw new Error(`No se encontró el carrito con id ${cid}`);
             }
-
-            await ProductManager.getProductById(pid);
+    
+            const cart = this.carts[cartIndex];
+    
+            await ProductManager.getInstance().getProductById(pid);
             const product = cart.products.find(product => product.productId === pid);
-
+    
             if(!product){
                 cart.products.push({
                     productId: pid,
@@ -81,6 +85,7 @@ export class CartsManager {
             throw error;
         }
     }
+    
 
     async deleteProdFromCart(cid, pid){
         try {
