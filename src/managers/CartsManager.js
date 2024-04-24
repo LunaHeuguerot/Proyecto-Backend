@@ -21,13 +21,15 @@ export class CartsManager {
         try {
             const response = await fs.promises.readFile(this.path, 'utf-8');
             this.carts = JSON.parse(response);
-            const cart = {
+            const newCart = {
                 id: this.carts.length !== 0 ? this.carts[this.carts.length - 1].id + 1 : 1,
                 products: []
             }
 
+            this.carts.push(newCart);
+
             await fs.promises.writeFile(this.path, JSON.stringify(this.carts, null, '\t'));
-            return cart;
+            return newCart;
         } catch (error) {
             throw error;
         }
@@ -54,6 +56,8 @@ export class CartsManager {
             const response = await fs.promises.readFile(this.path, 'utf-8');
             this.carts = JSON.parse(response);
             const cart = this.carts.find(cart => cart.id === cid);
+            console.log(response);
+            console.log(cart);
 
             if(!cart){
                 throw new Error(`No se encontró el carrito con id ${cid}`);

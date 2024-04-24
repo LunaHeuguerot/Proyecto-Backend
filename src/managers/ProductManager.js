@@ -55,7 +55,7 @@ export class ProductManager {
         const data = JSON.stringify(this.products, null, 2);
 
         try {
-            await fs.writeFile(this.path, data);
+            await fs.promises.writeFile(this.path, data);
             console.log('Datos guardados exitosamente');
         } catch (error) {
             console.error('Error al escribir el archivo', error);
@@ -91,42 +91,46 @@ export class ProductManager {
     }
 
     async updateProduct(id, updatedProduct){
-        await this.getProducts();
-
-        if(this.products.find((p) => p.id === id) === undefined){
-            console.error(`El producto con id ${id} no existe`);
-            return;
-        }
-
-        const index = this.products.findIndex(p => p.id === id);
-        this.products[index] = { id, ...updatedProduct };
-
         try {
-            await fs.writeFile(this.path, JSON.stringify(this.products));
-            console.log('Archivo actualizado');
+            await this.getProducts();
+
+            console.log("Lista de productos:", this.products);
+            console.log("ID del producto a actualizar:", id);
+
+            const existingProductIndex = this.products.findIndex(p => parseInt(p.id) === parseInt(id));
+
+            if(existingProductIndex === -1) {
+                console.error(`El producto con id ${id} no existe`);
+                return;
+            }
+
+            this.products[existingProductIndex] = { id, ...updatedProduct };
+
+            await fs.promises.writeFile(this.path, JSON.stringify(this.products));
+            console.log('Producto actualizado exitosamente');
         } catch (error) {
-            console.error('No se pudo actualizar el archivo', error);
+            console.error('Error al actualizar el producto', error);
         }
     }
 
     async deleteProduct(id){
-        await this.getProducts();
-
-        if(this.products.find((p) => p.id === id) === undefined){
-            console.error(`El producto con el id ${id} no existe`);
-            return;
-        }
-
-        const index = this.products.findIndex(p => p.id === id);
-
-        this.products.splice(index, 1);
-
         try {
-            await fs.writeFile(this.path, JSON.stringify(this.products));
+            await this.getProducts();
+    
+            const existingProductIndex = this.products.findIndex(p => parseInt(p.id) === parseInt(id));
+            if(existingProductIndex === -1) {
+                console.error(`El producto con el id ${id} no existe`);
+                return;
+            }
+    
+            this.products.splice(existingProductIndex, 1);
+
+            await fs.promises.writeFile(this.path, JSON.stringify(this.products));
             console.log('Producto borrado exitosamente');
         } catch (error) {
-            console.error('No se pudo borrar el archivo', error);
+            console.error('Error al borrar el producto', error);
         }
     }
+    
 }
 
