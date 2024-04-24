@@ -5,7 +5,7 @@ const productsRouter = express.Router();
 
 productsRouter.get('/', async(req, res) => {
     try {
-        const products = await ProductManager.getProducts();
+        const products = await ProductManager.getInstance().getProducts();
         const limit = parseInt(req.query.limit);
         let limitedProducts = [...products];
 
@@ -20,7 +20,7 @@ productsRouter.get('/', async(req, res) => {
 });
 productsRouter.get('/:pid', async(req, res) => {
     try {
-        const products = await ProductManager.getProducts();
+        const products = await ProductManager.getInstance().getProducts();
         let pid = parseInt(req.params.pid);
         let product = products.find(p => p.id === pid);
 
@@ -34,7 +34,7 @@ productsRouter.get('/:pid', async(req, res) => {
 productsRouter.post('/', async(req, res) => {
     try {
         let product = req.body;
-        product = await ProductManager.addProduct(product);
+        product = await ProductManager.getInstance().addProduct(product);
         res.json({ status: 'success', payload: product });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -44,7 +44,7 @@ productsRouter.put('/:pid', async(req, res) => {
     try {
         const id = req.params.pid;
         let product = req.body;
-        product = await ProductManager.updateProduct(id, product);
+        product = await ProductManager.getInstance().updateProduct(id, product);
         res.json({ status: 'success', payload: product});
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -53,7 +53,7 @@ productsRouter.put('/:pid', async(req, res) => {
 productsRouter.delete('/:pid', async(req, res) => {
     try {
         const id = req.params.pid;
-        const product = await ProductManager.deleteProduct(id);
+        const product = await ProductManager.getInstance().deleteProduct(id);
         res.json({ status: 'success', payload: product });
     } catch {
         res.status(500).json({ error: error.message });
