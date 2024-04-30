@@ -1,5 +1,3 @@
-import { response } from "express";
-
 const socket = io();
 
 socket.on('products', products => {

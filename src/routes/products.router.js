@@ -42,7 +42,7 @@ productsRouter.post('/', async(req, res) => {
 });
 productsRouter.put('/:pid', async(req, res) => {
     try {
-        const id = req.params.pid;
+        const id = +req.params.pid;
         let product = req.body;
         product = await ProductManager.getInstance().updateProduct(id, product);
         res.json({ status: 'success', payload: product});
