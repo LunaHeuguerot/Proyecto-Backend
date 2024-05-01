@@ -2,16 +2,6 @@
 
 <table id="products-table"></table>
 
-<div>
-    <h1>Listado de productos</h1>
-
-    <ul id="productsList" class="list-group">
-        {{#each products}}
-            <li class="list-group-item">{{title}} ($ {{price}})</li>
-        {{/each}}
-    </ul>
-</div>
-
 <form id="new-Product" action="/realtimeproducts" method="post">
     <h2>Add Product: </h2>
 
@@ -76,4 +66,4 @@
 <div class="responsive-container" id="responsive-container"></div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="js/realTimeProducts.js"></script>
+<script src="realTimeProducts.js"></script>

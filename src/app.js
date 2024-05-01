@@ -11,6 +11,7 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(`${config.DIRNAME}/public`))
 
 //HANDLEBARS
 app.engine('handlebars', handlebars.engine());
@@ -20,7 +21,7 @@ app.set('view engine', 'handlebars');
 //RUTAS
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
-app.use('/', realTimeRouter)
+app.use("/", realTimeRouter)
 
 app.use('/static', express.static(`${config.DIRNAME}/public`));
 
@@ -32,22 +33,12 @@ const httpServer = app.listen(config.PORT, () => {
 const socketServer = new Server(httpServer);
 app.set('socketServer', socketServer);
 
-app.get('/', async(req, res) => {
+app.get('/', async (req, res) => {
     try {
         const products = await ProductManager.getInstance().getProducts();
 
-        res.render('home', { Title: 'Home', products: products });
-    } catch (error) {
-        console.error('Error al obtener los productos:', error);
-        res.status(500).send('Error interno del servidor');
-    }
-});
+        res.render('home', { title: 'Home', products: products });
 
-app.get('/realtimeproducts', async(req, res) => {
-    try {
-        const products = await ProductManager.getInstance().getProducts();
-
-        res.render('realTimeProducts', { Title: 'REAL TIME PRODUCTS', products: products });
     } catch (error) {
         console.error('Error al obtener los productos:', error);
         res.status(500).send('Error interno del servidor');
@@ -77,11 +68,9 @@ socketServer.on('connection', async (socket) => {
                 thumbnail: newProduct.thumbnail,
             }
 
-            const pushedProd = await ProductManager.getInstance().addProduct(newProd);
-            const pushedId = pushedProd.id;
-            const updatedList = await ProductManager.getInstance().getProducts();
-            socketServer.emit('products', updatedList);
-            socketServer.emit('response', { status: 'success', message: `Product with ID ${pushedId} successfully added`});
+            await ProductManager.getInstance().addProduct(newProd);
+            console.log('Product successfully added', productData);
+            socketServer.emit('newProd', productData);
         } catch (error) {
             socketServer.emit('response', { status: 'error', message: error.message });
         }
@@ -92,8 +81,8 @@ socketServer.on('connection', async (socket) => {
             const pId = parseInt(id);
             await ProductManager.getInstance().deleteProduct(pId);
             const updatedList = await ProductManager.getInstance().getProducts();
+            console.log(`Product with id ${pId} successfully deleted`);
             socketServer.emit('products', updatedList);
-            socketServer.emit('response', { status: 'success', message: `Product with ID ${pId} successfully deleted`})
         } catch (error) {
             socketServer.emit('response', { status: 'error', message: error.message });
         }
