@@ -69,8 +69,9 @@ socketServer.on('connection', async (socket) => {
             }
 
             await ProductManager.getInstance().addProduct(newProd);
-            console.log('Product successfully added', productData);
-            socketServer.emit('newProd', productData);
+            const updatedList = await ProductManager.getInstance().getProducts();
+            socketServer.emit('products', updatedList);
+            socketServer.emit('response', { status: 'success', message: `Product added successfully` })
         } catch (error) {
             socketServer.emit('response', { status: 'error', message: error.message });
         }
